@@ -15,23 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
   div.appendChild(filterCheckbox);
   mainDiv.insertBefore(div, ul);
   filterCheckbox.addEventListener("change", (e) => {
-    const isChecked = e.target.checked; // TRUE if checked, FALSE if not
-    const lis = ul.children; //  provides a reference to a collection of elements children
+    const isChecked = e.target.checked; //  TRUE if checked, FALSE if not
+    const lis = ul.children;            //  Provides a reference to a collection of elements children
     if (isChecked) {
-      //  Daca e bifat
+      //  If checked
       for (let i = 0; i < lis.length; i++) {
-        //  Parcurg toata lista de invitati
+        //  Go through invitees list
         let li = lis[i];
         if (li.className === "responded") {
-          //  Daca invitatul a bifat Confirmed
-          li.style.display = ""; //  Nu face nimic
+          //  If invitee is confirmed
+          li.style.display = ""; //  Do nothing
         } else {
-          //  Altfel
-          li.style.display = "none"; //  Ascunde invitatul
+          li.style.display = "none"; //  Hide invitee
         }
       }
     } else {
-      //  Daca nu e bifat, afiez toti invitatii
+      //  If not checked, display all invitees
       for (let i = 0; i < lis.length; i++) {
         let li = lis[i];
         li.style.display = "";
@@ -39,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  //  Creating <li> elements with names, checkbox, edit button and remove button
+  //  Creates <li> elements with names, checkbox, edit button and remove button
   function createLI(text) {
     //  Creates specified element with specified property and value
     function createElement(elementName, property, value) {
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return element;
     }
     //  Creates element and appends it to the <li>
-    function appendToLI(elementName, property, value){
+    function appendToLI(elementName, property, value) {
       const element = createElement(elementName, property, value);
       li.appendChild(element);
       return element;
@@ -56,18 +55,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const li = document.createElement("li");
 
-    //  Practic modific TEXT ELEMENT (reprezentat de numele invitatului)
-    //  in HTML ELEMENT (reprezentat de <span> care la randul lui are TEXT ELEMENT)
+    //  To be able to modify the invitee name (text node) easily, insert it into
+    //    a <span> tag.
     appendToLI("span", "textContent", text);
-/*
-    const label = appendToLI("label", 'textContent', 'Confirmed');
-    const checkbox = createElement("input", 'type', 'checkbox');
-    label.appendChild(checkbox);
-    ******REFACTORED BELOW******
-*/
+    /*
+        const label = appendToLI("label", 'textContent', 'Confirmed');
+        const checkbox = createElement("input", 'type', 'checkbox');
+        label.appendChild(checkbox);
+        ******REFACTORED BELOW******
+    */
     appendToLI("label", 'textContent', 'Confirmed')
-        .appendChild(createElement("input", 'type', 'checkbox'));
-        
+      .appendChild(createElement("input", 'type', 'checkbox'));
+
     appendToLI("button", 'textContent', 'Edit');
     appendToLI("button", 'textContent', 'Remove');
 
@@ -77,9 +76,25 @@ document.addEventListener("DOMContentLoaded", () => {
   //  Registering Names
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const text = input.value;
-    input.value = "";
-    const li = createLI(text);
+    const newInvitee = input.value;
+
+    if (!newInvitee || !isNaN(newInvitee)) {          // If no name has been written (If newInvitee = '')
+      alert('Please type the name of the person you would like to invite!');
+      input.value = "";                               // Reset the text to '' after submitting
+      return;                                         // Exit the handler
+    } else {                                          // If the name already exists in the array
+      const lis = ul.children;                        // Select all present <li> tags
+      for (let i = 0; i < lis.length; i++) {
+        const alreadyInvited = lis[i].firstElementChild.textContent;  // Get names of already invited people
+        if (newInvitee === alreadyInvited) {
+          alert(`${newInvitee} has already been invited!`);
+          input.value = "";                           // Reset the text to '' after submitting
+          return;                                     // Exit the handler
+        }
+      }
+    }
+    input.value = "";                                 // Reset the text to '' after submitting
+    const li = createLI(newInvitee);
     ul.appendChild(li);
   });
 
@@ -102,8 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const button = e.target;
       const li = button.parentNode;
       const ul = li.parentNode;
-      
-      const nameActions = {
+      const nameActions = {   // Object containing possible actions
         Remove: () => {
           ul.removeChild(li);
         },
@@ -127,9 +141,9 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       const action = button.textContent;  // This can be moved up above nameActions object, with the other declarations
       nameActions[action]();              // This replaces all IF ELSE
-      /*
-        action will only be one of this 3 posible strings: remove, edit, save
-        in the IF, action is compared to each possible string, so when a match is
+      /*           ^^^^
+        action will only be one of this 3 posible strings: remove, edit, save.
+        In the IF, action is compared to each possible string, so when a match is
         found, that same word will be used to run the branch.
         In the line above, the string in action will be used to acces the function
         directly from the object. Then the function will be executed.
@@ -138,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         match the name of the nameActions properties.
 
       */
-     
+
       // if (action === "Remove") {
       //   nameActions.remove();
       // } else if (action === "Edit") {
