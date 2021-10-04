@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   div.appendChild(filterLabel);
   div.appendChild(filterCheckbox);
   mainDiv.insertBefore(div, ul);
+  
+  //  Hide those who haven't responded
   filterCheckbox.addEventListener("change", (e) => {
     const isChecked = e.target.checked; //  TRUE if checked, FALSE if not
     const lis = ul.children;            //  Provides a reference to a collection of elements children
@@ -64,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         label.appendChild(checkbox);
         ******REFACTORED BELOW******
     */
-    appendToLI("label", 'textContent', 'Confirmed')
+    appendToLI("label", 'textContent', 'Confirm')
       .appendChild(createElement("input", 'type', 'checkbox'));
 
     appendToLI("button", 'textContent', 'Edit');
@@ -101,13 +103,17 @@ document.addEventListener("DOMContentLoaded", () => {
   //  Checkbox
   ul.addEventListener("change", (e) => {
     const checkbox = e.target;
-    const checked = checkbox.checked; // TRUE if checked, FALSE if not
+    const checked = checkbox.checked;                 // TRUE if checked, FALSE if not
     const listItem = checkbox.parentNode.parentNode;
+    const label = checkbox.parentNode;
+    let textNode = label.childNodes[0];               //  Select the text node containing
 
     if (checked) {
       listItem.className = "responded";
+      textNode.data = 'Confirmed';                    //  Change text
     } else {
       listItem.className = "";
+      textNode.data = 'Confirm';                      //  Change text
     }
   });
 
