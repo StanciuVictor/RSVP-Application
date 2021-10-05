@@ -9,3 +9,4 @@ The user has the option to add invitees to the list, check them as confirmed att
 ### app_refactored.js
 Besides the code being refactored:
 * The user cannot insert an empty string or a duplicate name to the invitees list.
+* Confirmation process more concise. Text says "Confirmed" only after the atendance has been confirmed.
