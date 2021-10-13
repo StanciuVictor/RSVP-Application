@@ -102,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     input.value = "";                                 // Reset the text to '' after submitting
     const li = createLI(newInvitee);
     ul.appendChild(li);
+    addInvitee(newInvitee);
   });
 
   // Checkbox
@@ -129,7 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const ul = li.parentNode;
       const nameActions = {   // Object containing possible actions
         Remove: () => {
+          const inviteeName = li.firstElementChild.textContent;
           ul.removeChild(li);
+          removeInvitee(inviteeName);
         },
         Edit: () => {
           const span = li.firstElementChild;
@@ -171,4 +174,41 @@ document.addEventListener("DOMContentLoaded", () => {
       // }
     }
   });
+
+  // Local Storage
+
+  // Returns an array of all invitees from localStorage, or an empty array if there are no invitees
+  function getInvitees(){
+    const invitees = localStorage.getItem('invitees');  // is a string
+    if(invitees){
+      return JSON.parse(invitees);  // transform string to array
+    }
+    return [];
+  }
+
+  function addInvitee(name){
+    const invitees = getInvitees(); // get array of invitees from localStorage
+    invitees.push(name);
+    localStorage.setItem('invitees', JSON.stringify(invitees));
+  }
+
+  function removeInvitee(inviteeName){
+    const invitees = getInvitees(); // get array of invitees from localStorage
+    const inviteeIndex = invitees.indexOf(inviteeName);
+    invitees.splice(inviteeIndex, 1); // Delete name at the index
+    localStorage.setItem('invitees', JSON.stringify(invitees));
+  }
+
+  function displayInvitees(){
+    const invitees = getInvitees(); // get array of invitees from localStorage
+    invitees.forEach(person => {    // display each of them in a <li> inside the <ul>
+      const li = createLI(person);
+      ul.appendChild(li);
+    });
+  }
+
+  if ('localStorage' in window && window.localStorage !== null) {
+    displayInvitees();
+  }
+
 });
