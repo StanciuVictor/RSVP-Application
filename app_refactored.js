@@ -24,9 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let i = 0; i < lis.length; i++) {
         // Go through invitees list
         let li = lis[i];
+        let confirmLabel = li.getElementsByTagName('label')[0];
         if (li.className === "responded") {
           // If invitee is confirmed
           li.style.display = "";                      // Do nothing
+          confirmLabel.style.display = 'none';        // Hide label with checkbox
         } else {
           li.style.display = "none";                  // Hide invitee
         }
@@ -35,7 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // If not checked, display all invitees
       for (let i = 0; i < lis.length; i++) {
         let li = lis[i];
+        let confirmLabel = li.getElementsByTagName('label')[0];
         li.style.display = "";
+        confirmLabel.style.display = '';              // Show label with checkbox
       }
     }
   });
@@ -43,14 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Creates <li> elements with names, checkbox, edit button and remove button
   function createLI(text) {
     // Creates specified element with specified property and value
-    function createElement(elementName, property, value) {
+    function createNewElement(elementName, property, value) {
       const element = document.createElement(elementName);
       element[property] = value;
       return element;
     }
     // Creates element and appends it to the <li>
     function appendToLI(elementName, property, value) {
-      const element = createElement(elementName, property, value);
+      const element = createNewElement(elementName, property, value);
       li.appendChild(element);
       return element;
     }
@@ -67,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ******REFACTORED BELOW******
     */
     appendToLI("label", 'textContent', 'Confirm')
-      .appendChild(createElement("input", 'type', 'checkbox'));
+      .appendChild(createNewElement("input", 'type', 'checkbox'));
 
     appendToLI("button", 'textContent', 'Edit');
     appendToLI("button", 'textContent', 'Remove');
@@ -106,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checked = checkbox.checked;                 // TRUE if checked, FALSE if not
     const listItem = checkbox.parentNode.parentNode;
     const label = checkbox.parentNode;
-    let textNode = label.childNodes[0];               // Select the text node containing
+    const textNode = label.childNodes[0];             // Select the text node containing
 
     if (checked) {
       listItem.className = "responded";
