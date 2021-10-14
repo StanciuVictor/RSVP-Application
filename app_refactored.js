@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterLabel = document.createElement("label");
   const filterCheckbox = document.createElement("input");
 
-  filterLabel.textContent = "Hide those who haven't responded";
+  filterLabel.textContent = "Hide those who haven't confirmed";
   filterCheckbox.type = "checkbox";
   div.appendChild(filterLabel);
   div.appendChild(filterCheckbox);
@@ -65,10 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
     //    a <span> tag.
     appendToLI("span", "textContent", text);
     /*
+    ******REFACTORED BELOW******
     const label = appendToLI("label", 'textContent', 'Confirmed');
     const checkbox = createElement("input", 'type', 'checkbox');
     label.appendChild(checkbox);
-    ******REFACTORED BELOW******
     */
     appendToLI("label", 'textContent', 'Confirm')
       .appendChild(createNewElement("input", 'type', 'checkbox'));
@@ -88,24 +88,25 @@ document.addEventListener("DOMContentLoaded", () => {
       alert('Please type the name of the person you would like to invite!');
       input.value = "";                               // Reset the text to '' after submitting
       return;                                         // Exit the handler
-    } else {                                          // If the name already exists in the array
+    } else {                                          
       const lis = ul.children;                        // Select all present <li> tags
       for (let i = 0; i < lis.length; i++) {
         const alreadyInvited = lis[i].firstElementChild.textContent;  // Get names of already invited people
-        if (newInvitee === alreadyInvited) {
+        if (newInvitee === alreadyInvited) {          // If the name already exists in the array
           alert(`${newInvitee} has already been invited!`);
           input.value = "";                           // Reset the text to '' after submitting
           return;                                     // Exit the handler
         }
       }
     }
+
+    // If the invitee name is not duplicate or null
     input.value = "";                                 // Reset the text to '' after submitting
     const li = createLI(newInvitee);
     ul.appendChild(li);
-    addInvitee(newInvitee);
   });
 
-  // Checkbox
+  // Conform Checkbox
   ul.addEventListener("change", (e) => {
     const checkbox = e.target;
     const checked = checkbox.checked;                 // TRUE if checked, FALSE if not
@@ -115,10 +116,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (checked) {
       listItem.className = "responded";
-      textNode.data = 'Confirmed';                    // Change text
+      textNode.data = 'Confirmed';                    // Change text in label
     } else {
       listItem.className = "";
-      textNode.data = 'Confirm';                      // Change text
+      textNode.data = 'Confirm';                      // Change text in label
     }
   });
 
@@ -130,9 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const ul = li.parentNode;
       const nameActions = {   // Object containing possible actions
         Remove: () => {
-          const inviteeName = li.firstElementChild.textContent;
           ul.removeChild(li);
-          removeInvitee(inviteeName);
         },
         Edit: () => {
           const span = li.firstElementChild;
@@ -153,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
       const action = button.textContent;  // This can be moved up above nameActions object, with the other declarations
-      nameActions[action]();              // This replaces all IF ELSE
+      nameActions[action]();              // This replaces all IF ELSE from below
       /*           ^^^^
       action will only be one of this 3 posible strings: remove, edit, save.
       In the IF, action is compared to each possible string, so when a match is
@@ -175,40 +174,125 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Local Storage
+  // Local Storage section starts here ##############################################################################################
 
-  // Returns an array of all invitees from localStorage, or an empty array if there are no invitees
-  function getInvitees(){
-    const invitees = localStorage.getItem('invitees');  // is a string
-    if(invitees){
-      return JSON.parse(invitees);  // transform string to array
-    }
-    return [];
-  }
+  // If local storage is supported, use it
+  if ('localStorage' in window && window.localStorage !== null) {
 
-  function addInvitee(name){
-    const invitees = getInvitees(); // get array of invitees from localStorage
-    invitees.push(name);
-    localStorage.setItem('invitees', JSON.stringify(invitees));
-  }
+    /**
+     * Retrieves string information about invitees from local storage and
+     * transforms it into an array so that it will be easier to modify it
+     * 
+     * @returns {array} a multidimensional array containing arrays that each correspond to one invitee
+     *                  OR an empty array if there are no invitees stored in local storage.
+     */
+    // Theese arrays contain info (HTML code) about each invitee.
+    const getInviteesFromLocal = function () {
+      const invitees = localStorage.getItem('invitees');  // is a string
+      if (invitees) {
+        return JSON.parse(invitees);  // transform string to array
+      }
+      return [];
+    };
 
-  function removeInvitee(inviteeName){
-    const invitees = getInvitees(); // get array of invitees from localStorage
-    const inviteeIndex = invitees.indexOf(inviteeName);
-    invitees.splice(inviteeIndex, 1); // Delete name at the index
-    localStorage.setItem('invitees', JSON.stringify(invitees));
-  }
+    /**
+     * Recreates a <li> element based on information stored in local storage.
+     * Each <li> represents one invitee.
+     * The <li> element is then appended to the <ul> element.
+     * 
+     * @param {array} individualInfo - Array containing one element. The element is an HTML code corresponding to one invitee.
+     */
+    const addInviteeFromLocal = function (individualInfo) {
+      const newLI = document.createElement('li');
 
-  function displayInvitees(){
-    const invitees = getInvitees(); // get array of invitees from localStorage
-    invitees.forEach(person => {    // display each of them in a <li> inside the <ul>
-      const li = createLI(person);
-      ul.appendChild(li);
+      // Add to the <li> its children: span, label, buttons, etc.
+      newLI.innerHTML = individualInfo[0];
+      const confirmLabel = newLI.children[1];
+      const checkbox = newLI.children[1].children[0];
+
+      // If invitee was confirmed, modify the HTML code accordingly
+      if (newLI.innerHTML.includes("Confirmed")) {
+        newLI.className = 'responded';
+        checkbox.checked = true;
+      } else {
+        newLI.className = '';
+        checkbox.checked = false;
+      }
+
+      // Uncheck filter to display all invitees
+      filterCheckbox.checked = false;
+
+      // Display label of confirmation for every invitee
+      confirmLabel.style.display = '';
+
+      ul.appendChild(newLI);
+    };
+
+    // After page is loaded
+    window.addEventListener('load', (e) => {
+
+      // Get multidimensional array of invitees' info from local storage
+      const inviteesArrFromLocal = getInviteesFromLocal();
+
+      // Add each array of invitee's info (HTML code) to the <ul>
+      inviteesArrFromLocal.forEach(individualInfo => {
+        addInviteeFromLocal(individualInfo);
+      });
+    });
+
+    // Save invitees to local storage before closing the web page
+    window.addEventListener('beforeunload', (e) => {
+      const savedInviteesArr = [];
+      const inviteesLiTags = ul.children;             // HTMLCollection => must be transformed into an array
+      // inviteesLiTags contain children elements as <span>, <button>, etc
+      [...inviteesLiTags].forEach(element => {        // [...element] generates an array
+
+        // Get the html inside the <li> element, meaning the invitee info and store it in an array
+        const individualInfo = [element.innerHTML];
+
+        // Save the array containing invitee info to a multidimensional array
+        // "An array off arrays that contain info for each individual"
+        savedInviteesArr.push(individualInfo);
+      });
+      localStorage.setItem('invitees', JSON.stringify(savedInviteesArr));
     });
   }
 
-  if ('localStorage' in window && window.localStorage !== null) {
-    displayInvitees();
-  }
+
+  // Local Storage
+
+  // // Returns an array of all invitees from localStorage, or an empty array if there are no invitees
+  // function getInvitees(){
+  //   const invitees = localStorage.getItem('invitees');  // is a string
+  //   if(invitees){
+  //     return JSON.parse(invitees);  // transform string to array
+  //   }
+  //   return [];
+  // }
+
+  // function addInvitee(name){
+  //   const invitees = getInvitees(); // get array of invitees from localStorage
+  //   invitees.push(name);
+  //   localStorage.setItem('invitees', JSON.stringify(invitees));
+  // }
+
+  // function removeInvitee(inviteeName){
+  //   const invitees = getInvitees(); // get array of invitees from localStorage
+  //   const inviteeIndex = invitees.indexOf(inviteeName);
+  //   invitees.splice(inviteeIndex, 1); // Delete name at the index
+  //   localStorage.setItem('invitees', JSON.stringify(invitees));
+  // }
+
+  // function displayInvitees(){
+  //   const invitees = getInvitees(); // get array of invitees from localStorage
+  //   invitees.forEach(person => {    // display each of them in a <li> inside the <ul>
+  //     const li = createLI(person);
+  //     ul.appendChild(li);
+  //   });
+  // }
+
+  // if ('localStorage' in window && window.localStorage !== null) {
+  //   displayInvitees();
+  // }
 
 });

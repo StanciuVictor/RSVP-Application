@@ -11,6 +11,4 @@ Besides the code being refactored:
 * The user cannot insert an empty string or a duplicate name to the invitees list.
 * Confirmation process more concise. Text says "Confirmed" only after the atendance has been confirmed.
 * List of invited people is now stored in browser's local storage.
-```diff
-- On web page refresh, "confirmed" status is not saved.
-```
+* The app keeps track of the invitation's status (confirmed / not confirmed) and displays invitees accordingly.
