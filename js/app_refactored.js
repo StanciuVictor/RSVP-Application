@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ul.appendChild(li);
   });
 
-  // Conform Checkbox
+  // Confirm Checkbox
   ul.addEventListener("change", (e) => {
     const checkbox = e.target;
     const checked = checkbox.checked;                 // TRUE if checked, FALSE if not
