@@ -1,4 +1,4 @@
-# RSVP-Application
+# [RSVP-Application](https://stanciuvictor.github.io/RSVP-Application/)
 ## Simple Fornt-End App that creates a list with invitees names.
 
 Just remember to change the <code><script src="..."></script></code> tag in the .html file based on the .js file you want to use.
